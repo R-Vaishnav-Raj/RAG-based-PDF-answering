@@ -1,0 +1,594 @@
+{
+  "name": "PDF Answering Bot",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message",
+          "*"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -300,
+        -60
+      ],
+      "id": "41d06018-5c12-49f2-ba8a-a5e6a46f4389",
+      "name": "Telegram Trigger",
+      "webhookId": "50659592-cff5-4950-9fdd-0371699fbe67",
+      "credentials": {
+        "telegramApi": {
+          "id": "fKEHVGVXspkJG3NQ",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "0be77056-4c4f-42ab-a434-6a91555db5c1",
+              "leftValue": "={{ $json.message.text }}",
+              "rightValue": "/start",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -120,
+        -60
+      ],
+      "id": "551266c5-ff95-4997-bb94-81f5233ba4c6",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.message.chat.id }}",
+        "text": "Send me a PDF",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        60,
+        -220
+      ],
+      "id": "56a2f24f-4fa9-424a-b57d-86c493d3c689",
+      "name": "Telegram",
+      "webhookId": "4895d7bd-63be-43b2-aa3a-cce0e812c267",
+      "credentials": {
+        "telegramApi": {
+          "id": "fKEHVGVXspkJG3NQ",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "96e8e158-ff93-4005-a68b-98f5cd60dad0",
+              "leftValue": "={{ $json.message.document.file_id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        60,
+        40
+      ],
+      "id": "5e586664-95da-49b6-85a6-aecd4a238de5",
+      "name": "else if"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.message.document.file_id }}"
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        320,
+        -160
+      ],
+      "id": "0b08faac-0d4e-4ece-874e-864b186f90b8",
+      "name": "Telegram1",
+      "webhookId": "8ec34361-41e9-403a-a79a-3db905296911",
+      "credentials": {
+        "telegramApi": {
+          "id": "fKEHVGVXspkJG3NQ",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "tableName": {
+          "__rl": true,
+          "value": "docs_vector",
+          "mode": "list",
+          "cachedResultName": "docs_vector"
+        },
+        "options": {
+          "queryName": "match_documents"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.2,
+      "position": [
+        960,
+        -80
+      ],
+      "id": "b11589bb-ddd6-4249-88fc-1d47f930a3b5",
+      "name": "Supabase Vector Store1",
+      "credentials": {
+        "supabaseApi": {
+          "id": "y0VOxgQYl4UB0TSS",
+          "name": "pdf_answering_bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        920,
+        120
+      ],
+      "id": "7b71b1a0-eb55-4b3e-a131-0dd980c039f5",
+      "name": "Embeddings OpenAI1",
+      "credentials": {
+        "openAiApi": {
+          "id": "AH613ePJrsO28oHk",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1,
+      "position": [
+        1040,
+        120
+      ],
+      "id": "d6cd4c00-5d29-4039-8f1a-361555a0fb3e",
+      "name": "Default Data Loader1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        1100,
+        320
+      ],
+      "id": "893be956-2f13-4d05-9ddc-8327f7079241",
+      "name": "Recursive Character Text Splitter1"
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        620,
+        -160
+      ],
+      "id": "7f73ab9e-ba06-4fb9-9c00-fdcb9291413b",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "tableId": "docs",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "file_name",
+              "fieldValue": "={{ $('Telegram1').item.binary.data.fileName }}"
+            },
+            {
+              "fieldId": "content",
+              "fieldValue": "={{ $json.text }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        920,
+        -260
+      ],
+      "id": "051462e7-95bf-4769-8470-5bb019eb5685",
+      "name": "Supabase",
+      "credentials": {
+        "supabaseApi": {
+          "id": "y0VOxgQYl4UB0TSS",
+          "name": "pdf_answering_bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4.1",
+          "mode": "list",
+          "cachedResultName": "GPT-4.1"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=You are a helpful assistant that answers questions based strictly on context retrieved from a document vector search tool called DocuMind Retriever.\n\nDocuMind Retriever is a tool that finds and returns the most relevant chunks of a PDF document using vector similarity. These chunks are retrieved from an embedding database and sent to you as context.\n\n🔐 Your strict responsibilities:\nYou must use only the provided context to generate your answer. Do not rely on prior knowledge or any external sources.\n\nDo not make assumptions or fabricate information.\nIf the context doesn’t include the answer, reply with:\n👉 “I couldn’t find the answer in the provided document.”\n\nBe concise and factual. Use clear and simple language.\n\nIf asked to summarize the document, do so only using the retrieved chunks.\n\nDo not reference page numbers or document structure, unless clearly provided in the context.\n\nthis was the question  {{ $json.message.text }}\n"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        220,
+        180
+      ],
+      "id": "4ff14500-c1f8-4274-93ac-612351f6c356",
+      "name": "OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "AH613ePJrsO28oHk",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        280,
+        500
+      ],
+      "id": "c533b892-f7ab-4548-9114-47fea89756ca",
+      "name": "Embeddings OpenAI2",
+      "credentials": {
+        "openAiApi": {
+          "id": "AH613ePJrsO28oHk",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolName": "pdf_data",
+        "toolDescription": "Fetches the most relevant documents by comparing a query's embedding with stored vectors using Supabase's vector similarity search. Returns top matching entries based on semantic similarity.",
+        "tableName": {
+          "__rl": true,
+          "value": "docs_vector",
+          "mode": "list",
+          "cachedResultName": "docs_vector"
+        },
+        "topK": 5,
+        "includeDocumentMetadata": false,
+        "options": {
+          "queryName": "match_documents"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.2,
+      "position": [
+        280,
+        340
+      ],
+      "id": "20d84f80-4bcc-4140-9e4a-bafcce7a6ec1",
+      "name": "DocuMind Retriever",
+      "credentials": {
+        "supabaseApi": {
+          "id": "y0VOxgQYl4UB0TSS",
+          "name": "pdf_answering_bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.message.content }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        560,
+        180
+      ],
+      "id": "e380e56b-56fd-453f-9f1a-b125d8fad600",
+      "name": "Telegram2",
+      "webhookId": "d06bcd3e-c5d1-4986-8d9a-d3f9ea50635d",
+      "credentials": {
+        "telegramApi": {
+          "id": "fKEHVGVXspkJG3NQ",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "PDF saved! Ask me anything.",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1180,
+        -260
+      ],
+      "id": "f380fe80-78a3-4c2e-afa1-8e69755b3a02",
+      "name": "Telegram3",
+      "webhookId": "a0a9fd54-12fa-423a-84c5-3898022970f8",
+      "credentials": {
+        "telegramApi": {
+          "id": "fKEHVGVXspkJG3NQ",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Telegram Trigger": [
+      {
+        "json": {
+          "update_id": 348502578,
+          "message": {
+            "message_id": 28,
+            "from": {
+              "id": 5467235328,
+              "is_bot": false,
+              "first_name": "Vaishnav",
+              "last_name": "Raj",
+              "language_code": "en"
+            },
+            "chat": {
+              "id": 5467235328,
+              "first_name": "Vaishnav",
+              "last_name": "Raj",
+              "type": "private"
+            },
+            "date": 1750690711,
+            "document": {
+              "file_name": "The Question of Violent Video Games and Aggression.pdf",
+              "mime_type": "application/pdf",
+              "file_id": "BQACAgUAAxkBAAMcaFlrlwVUUrG4yj98omCajASZfz8AAngVAALCuMhWbbGiZ7_rr-k2BA",
+              "file_unique_id": "AgADeBUAAsK4yFY",
+              "file_size": 521898
+            }
+          }
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "else if",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "else if": {
+      "main": [
+        [
+          {
+            "node": "Telegram1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram1": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store1",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader1": {
+      "ai_document": [
+        [
+          {
+            "node": "Supabase Vector Store1",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter1": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader1",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Supabase Vector Store1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Supabase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase": {
+      "main": [
+        [
+          {
+            "node": "Telegram3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase Vector Store1": {
+      "main": [
+        []
+      ]
+    },
+    "Embeddings OpenAI2": {
+      "ai_embedding": [
+        [
+          {
+            "node": "DocuMind Retriever",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DocuMind Retriever": {
+      "ai_tool": [
+        [
+          {
+            "node": "OpenAI",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI": {
+      "main": [
+        [
+          {
+            "node": "Telegram2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "59a66c15-1fd5-4d18-a570-0db61bb6b7cc",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "8004a49843c5f6ffd2f1c6d98023fb3bab0d4256c07b804b76c09f8213d907d4"
+  },
+  "id": "UBC6AZFBm3OWCh6r",
+  "tags": []
+}
