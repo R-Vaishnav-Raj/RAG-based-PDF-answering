@@ -11,16 +11,6 @@ It lets users **upload a PDF**, stores its content as vector embeddings in **Sup
 
 ---
 
-## 🧩 What is RAG?
-
-**Retrieval-Augmented Generation (RAG)** combines:
-- **Retrieval**: Find the most relevant text chunks using vector similarity search.
-- **Generation**: Use an AI model (**OpenAI GPT**) to answer the question using only the retrieved chunks as context.
-
-RAG is powerful for building chatbots that answer from specific documents **without making up facts**.
-
----
-
 ## ⚙️ How It Works
 
 1️⃣ **Telegram Trigger**  
